@@ -16,7 +16,7 @@ def ls(entries_dict, cmd_args):
             print("Download Location: " + dest)
             print("Unsaved Count: " + str(len(entries)))
             print("")
-            return True
+        return True
     else:
         search_author = cmd_args[1].upper()
         dl_id_n = 0
@@ -52,11 +52,11 @@ def dl(entries_dict, cmd_args):
             for target in dl_targets:
                 continue
 
-
         to_dl = parse_to_dl_arg(cmd_args[1])
 
     print("ERROR: dl could not be performed")
     return False
+
 
 def process_command_input(entries_dict, cmd):
     cmd_args = cmd.split(' ')
@@ -65,9 +65,11 @@ def process_command_input(entries_dict, cmd):
 
     if cmd_args[0] in ['q', 'quit', 'exit']:
         quit()
-    elif cmd_args[0] in ['ls', 'list']:
+    elif cmd_args[0] in ['l', 'ls', 'list']:
         ls(entries_dict, cmd_args)
-    elif cmd_args[0] in ['dl', 'download']:
+    elif cmd_args[0] in ['d', 'dl', 'download']:
         dl(entries_dict, cmd_args)
+    elif cmd_args[0] in ['s', 'sp', 'set', 'setp', 'setpath', 'setdlpath']:
+        set_download_path(entries_dict, cmd_args)
 
     return False

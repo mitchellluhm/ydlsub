@@ -1,0 +1,5 @@
+base_path=/home/mitchell/Videos
+ydl_cmd=youtube-dl -- ...
+ydl_lq_cmd=
+ydl_audio_cmd=
+ydl_archive_path=/home/mitchell/archiveydl.log

@@ -27,15 +27,36 @@ CMD_LQ='youtube-dl \
         --merge-output-format mkv \
         --yes-playlist '
 
+BASE_URL_CHANNEL = "https://www.youtube.com/feeds/videos.xml?channel_id="
+BASE_URL_USER = "https://www.youtube.com/feeds/videos.xml?user="
+CHANNEL = "/channel/"
+USER = "/user/"
 
-def getLines(filename):
+def get_lines(filename):
     with open(filename, 'r') as f:
         return f.readlines()
-    return ""
+    return []
 
 
 def is_comment_or_empty(line):
+    for c in line:
+        if c not in [' ', '#']:
+            return False
+
     return len(line) == 0 or line[0] == '#'
+
+
+def get_rss_url(line):
+    l = line.strip()
+    i = l.find(CHANNEL)
+    if i > 0:
+        return BASE_URL_CHANNEL + l[i + len(CHANNEL):]
+
+    i = l.find(USER)
+    if i > 0:
+        return BASE_URL_USER + l[i + len(USER):]
+
+    return line
 
 
 def get_line_parts(line):
@@ -44,7 +65,7 @@ def get_line_parts(line):
         return { }
 
     partsDict = {
-        'url' : parts[0],
+        'url' : get_rss_url(parts[0]),
         'hq' : 'y' in parts[1].lower(),
         'name' : parts[2].lower().strip()
     }
@@ -59,7 +80,7 @@ def interpret_line(line):
     return get_line_parts(line)
 
 
-ARCHIVED_LINES = getLines("/home/mitchell/archiveydl.log")
+ARCHIVED_LINES = get_lines("/home/mitchell/archiveydl.log")
 def already_downloaded(watchID):
     print(watchID)
     for line in ARCHIVED_LINES:
@@ -73,16 +94,16 @@ if len(sys.argv) < 3:
     print("Not enough arguments")
     sys.exit()
 
-lines = getLines(sys.argv[1])
+LINES = get_lines(sys.argv[1])
 BASE_PATH = sys.argv[2]
 WATCH = "watch\?"
 ENTRIES_DICT = {}
 QUIT = False
 
 # URL HQ LOCATION
-for line in lines:
+for line in LINES:
     lineInfo = interpret_line(line)
-    if lineInfo == { }:
+    if lineInfo == {}:
         continue
 
     unsavedEntries = []
@@ -102,9 +123,6 @@ print(len(ENTRIES_DICT))
 
 while True:
     cmd = input("> ")
-    #if cmd == "quit" or cmd == "exit":
-    #    sys.exit()
-
     cmds.process_command_input(ENTRIES_DICT, cmd)
 
 
