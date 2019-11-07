@@ -62,7 +62,7 @@ def get_rss_url(line):
 def get_line_parts(line):
     parts = line.split(' ')
     if len(parts) != 3:
-        return { }
+        return {}
 
     partsDict = {
         'url' : get_rss_url(parts[0]),
@@ -75,16 +75,15 @@ def get_line_parts(line):
 
 def interpret_line(line):
     if is_comment_or_empty(line):
-        return { }
+        return {}
 
     return get_line_parts(line)
 
 
 ARCHIVED_LINES = get_lines("/home/mitchell/archiveydl.log")
-def already_downloaded(watchID):
-    print(watchID)
+def already_downloaded(watch_id):
     for line in ARCHIVED_LINES:
-        if watchID in line:
+        if watch_id in line:
             return True
 
     return False
@@ -117,13 +116,11 @@ for line in LINES:
 
     ENTRIES_DICT[lineInfo['name']] = list(unsavedEntries)
 
-print("LEN")
-print(len(ENTRIES_DICT))
-#for dest, unsaved in ENTRIES_DICT.items():
+print(str(len(ENTRIES_DICT)) + " unique youtube channel(s) were read.")
 
 while True:
-    cmd = input("> ")
-    cmds.process_command_input(ENTRIES_DICT, cmd)
+    #cmd = input("> ")
+    cmds.process_command_input(ENTRIES_DICT, input("> "))
 
 
 '''

@@ -1,12 +1,20 @@
 import sys
 
-def author_match(search_author, entry_author):
-    return search_author == entry_author or search_author in entry_author
+# compare if search author a is equivalent to author b
+def author_match(a, b):
+    if a == b or a in b:
+        return True
+
+    # check without spaces or underscores
+    a = a.upper().replace(' ', '').replace('_', '')
+    b = b.upper().replace(' ', '').replace('_', '')
+    return a == b or a in b
 
 
 # quit
 def quit():
     sys.exit()
+
 
 # ls < author : optional >
 def ls(entries_dict, cmd_args):
@@ -18,11 +26,9 @@ def ls(entries_dict, cmd_args):
             print("")
         return True
     else:
-        search_author = cmd_args[1].upper()
         dl_id_n = 0
         for dest, entries in entries_dict.items():
-            entry_author = entries[0].author.upper()
-            if author_match(search_author, entry_author):
+            if author_match(cmd_args[1], entries[0].author):
                 print("Author: (" + str(dl_id_n) + ") " + entries[0].author)
                 print("Download Location: " + dest)
                 print("Unsaved Count: " + str(len(entries)))
@@ -36,7 +42,7 @@ def ls(entries_dict, cmd_args):
             
             dl_id_n += 1
 
-    print("ERROR: ls could not be performed")
+    print("ERROR: ls could not be performed.")
     return False
 
 
@@ -47,14 +53,31 @@ def dl(entries_dict, cmd_args):
         # dl all or quit?
         return False
     else:
+        def get_to_downloads(target):
+            dl_id_n = 0
+            for dest, entries in entries_dict.items():
+                if target[0] == str(dl_id_n):
+                    dl_id_a = 'a'
+                    for entry in entries:
+                        if (str(dl_id_n) + str(dl_id_a)).upper() == target.upper():
+                            return [entry]
+                        dl_id_a = chr(ord(dl_id_a) + 1)
+                elif not target[0].isnumeric() and author_match(target, entries[0].author):
+                    return entries
+
+                
+                dl_id_n += 1
+
         def parse_to_dl_arg(to_dl_arg):
             dl_targets = to_dl_arg.split(';')
             for target in dl_targets:
-                continue
+                if len(target) > 0:
+                    entries_to_dl = get_to_downloads(target)
+                    print(entries_to_dl[0].title)
 
         to_dl = parse_to_dl_arg(cmd_args[1])
 
-    print("ERROR: dl could not be performed")
+    print("ERROR: dl could not be performed.")
     return False
 
 
