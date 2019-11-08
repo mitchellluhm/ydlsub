@@ -1,4 +1,27 @@
 import sys
+import os
+
+CMD_HQ='youtube-dl \
+        --download-archive "~/archive.log" \
+        -i \
+        --add-metadata \
+        --all-subs \
+        --embed-subs \
+        --embed-thumbnail \
+        -f "(bestvideo[vcodec^=av01][height>=1080][fps>30]/bestvideo[vcodec=vp9.2][height>=1080][fps>30]/bestvideo[vcodec=vp9][height>=1080][fps>30]/bestvideo[vcodec^=av01][height>=1080]/bestvideo[vcodec=vp9.2][height>=1080]/bestvideo[vcodec=vp9][height>=1080]/bestvideo[height>=1080]/bestvideo[vcodec^=av01][height>=720][fps>30]/bestvideo[vcodec=vp9.2][height>=720][fps>30]/bestvideo[vcodec=vp9][height>=720][fps>30]/bestvideo[vcodec^=av01][height>=720]/bestvideo[vcodec=vp9.2][height>=720]/bestvideo[vcodec=vp9][height>=720]/bestvideo[height>=720]/bestvideo)+(bestaudio[acodec=opus]/bestaudio)/best" \
+        --merge-output-format mkv \
+        --yes-playlist '
+
+CMD_LQ='youtube-dl \
+        --download-archive "~/archive.log" \
+        -i \
+        --add-metadata \
+        --all-subs \
+        --embed-subs \
+        --embed-thumbnail \
+        -f best \
+        --merge-output-format mkv \
+        --yes-playlist '
 
 # compare if search author a is equivalent to author b
 def author_match(a, b):
@@ -60,22 +83,32 @@ def dl(entries_dict, cmd_args):
                     dl_id_a = 'a'
                     for entry in entries:
                         if (str(dl_id_n) + str(dl_id_a)).upper() == target.upper():
-                            return [entry]
+                            return (dest, [entry])
                         dl_id_a = chr(ord(dl_id_a) + 1)
                 elif not target[0].isnumeric() and author_match(target, entries[0].author):
-                    return entries
-
-                
+                    return (dest, entries)
                 dl_id_n += 1
+            return ("", [])
 
         def parse_to_dl_arg(to_dl_arg):
-            dl_targets = to_dl_arg.split(';')
+            dl_targets = [to_dl_arg]
+            if to_dl_arg.find(';') > 0:
+                dl_targets = to_dl_arg.split(';')
+
             for target in dl_targets:
                 if len(target) > 0:
-                    entries_to_dl = get_to_downloads(target)
-                    print(entries_to_dl[0].title)
+                    return get_to_downloads(target)
 
-        to_dl = parse_to_dl_arg(cmd_args[1])
+            return ("", [])
+
+        dest, entries = parse_to_dl_arg(cmd_args[1])
+        if len(dest) > 0:
+            os.makedirs(dest)
+            os.chdir(dest)
+            print("Downloading " + str(len(entries)) + " to " + dest)
+            for dl in entries:
+                print(dl.title)
+                os.system(CMD_HQ + dl.link)
 
     print("ERROR: dl could not be performed.")
     return False

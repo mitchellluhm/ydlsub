@@ -61,13 +61,13 @@ def get_rss_url(line):
 
 def get_line_parts(line):
     parts = line.split(' ')
-    if len(parts) != 3:
+    if len(parts) < 2:
         return {}
 
     partsDict = {
         'url' : get_rss_url(parts[0]),
-        'hq' : 'y' in parts[1].lower(),
-        'name' : parts[2].lower().strip()
+        #'hq' : 'y' in parts[1].lower(),
+        'name' : parts[1].strip()
     }
 
     return partsDict
@@ -89,12 +89,12 @@ def already_downloaded(watch_id):
     return False
 
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 2:
     print("Not enough arguments")
     sys.exit()
 
 LINES = get_lines(sys.argv[1])
-BASE_PATH = sys.argv[2]
+#BASE_PATH = sys.argv[2]
 WATCH = "watch\?"
 ENTRIES_DICT = {}
 QUIT = False
