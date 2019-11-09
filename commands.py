@@ -104,10 +104,10 @@ def dl(entries_dict, cmd_args):
 
         #dest, entries = parse_to_dl_arg(cmd_args[1])
         pending_dls = parse_to_dl_arg(cmd_args[1])
-        print(pending_dls)
         for dest, entries in pending_dls:
             if len(dest) > 0 and len(entries) > 0:
-                os.makedirs(dest)
+                if not os.path.isdir(dest):
+                    os.makedirs(dest)
                 os.chdir(dest)
                 print("Downloading " + str(len(entries)) + " to " + dest)
                 for dl in entries:
