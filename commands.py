@@ -95,20 +95,24 @@ def dl(entries_dict, cmd_args):
             if to_dl_arg.find(';') > 0:
                 dl_targets = to_dl_arg.split(';')
 
+            retList = []
             for target in dl_targets:
                 if len(target) > 0:
-                    return get_to_downloads(target)
+                    retList.append(get_to_downloads(target))
 
-            return ("", [])
+            return retList
 
-        dest, entries = parse_to_dl_arg(cmd_args[1])
-        if len(dest) > 0:
-            os.makedirs(dest)
-            os.chdir(dest)
-            print("Downloading " + str(len(entries)) + " to " + dest)
-            for dl in entries:
-                print(dl.title)
-                os.system(CMD_HQ + dl.link)
+        #dest, entries = parse_to_dl_arg(cmd_args[1])
+        pending_dls = parse_to_dl_arg(cmd_args[1])
+        print(pending_dls)
+        for dest, entries in pending_dls:
+            if len(dest) > 0 and len(entries) > 0:
+                os.makedirs(dest)
+                os.chdir(dest)
+                print("Downloading " + str(len(entries)) + " to " + dest)
+                for dl in entries:
+                    os.system(CMD_HQ + dl.link)
+                return True
 
     print("ERROR: dl could not be performed.")
     return False

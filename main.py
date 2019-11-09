@@ -3,7 +3,8 @@ import os
 import requests
 import re
 import feedparser
-import commands as cmds
+import commands
+import config
 
 CMD_HQ='youtube-dl \
         --download-archive "~/archive.log" \
@@ -98,6 +99,8 @@ LINES = get_lines(sys.argv[1])
 WATCH = "watch\?"
 ENTRIES_DICT = {}
 QUIT = False
+config.parse_config()
+print(config.CONFIRM_DL)
 
 # URL HQ LOCATION
 for line in LINES:
@@ -119,18 +122,4 @@ for line in LINES:
 print(str(len(ENTRIES_DICT)) + " unique youtube channel(s) were read.")
 
 while True:
-    #cmd = input("> ")
-    cmds.process_command_input(ENTRIES_DICT, input("> "))
-
-
-'''
-    linePath = os.path.join(BASEPATH, lineInfo['name'])
-    os.chdir(linePath)
-
-    if lineInfo['hq']:
-        print("~~~ Begin high quality download for URL: " + lineInfo['url'])
-        os.system(CMD_HQ + " '" + lineInfo['url'] + "'")
-    else:
-        print("~~~ Begin low quality download for URL: " + lineInfo['url'])
-        os.system(CMD_LQ + " '" + lineInfo['url'] + "'")
-'''
+    commands.process_command_input(ENTRIES_DICT, input("> "))
