@@ -60,6 +60,7 @@ def get_rss_url(line):
     return line
 
 
+CURRENT_GROUP = ""
 def get_line_parts(line):
     parts = line.split(' ')
     if len(parts) < 2:
@@ -67,16 +68,25 @@ def get_line_parts(line):
 
     partsDict = {
         'url' : get_rss_url(parts[0]),
-        #'hq' : 'y' in parts[1].lower(),
+        'group' : CURRENT_GROUP,
         'name' : parts[1].strip()
     }
 
     return partsDict
 
 
+def is_group(line):
+    return len(line) > 0 and ' ' not in line
+
+
 def interpret_line(line):
+    global CURRENT_GROUP
+
     if is_comment_or_empty(line):
         return {}
+
+    if is_group(line):
+        CURRENT_GROUP = line.strip()
 
     return get_line_parts(line)
 
@@ -97,10 +107,9 @@ if len(sys.argv) < 2:
 LINES = get_lines(sys.argv[1])
 #BASE_PATH = sys.argv[2]
 WATCH = "watch\?"
-ENTRIES_DICT = {}
+ENTRIES = [] # (lineInfo, entries)
 QUIT = False
 config.parse_config()
-print(config.CONFIRM_DL)
 
 # URL HQ LOCATION
 for line in LINES:
@@ -117,9 +126,10 @@ for line in LINES:
     if len(unsavedEntries) == 0:
         continue
 
-    ENTRIES_DICT[lineInfo['name']] = list(unsavedEntries)
+    ENTRIES.append( (lineInfo, list(unsavedEntries)) )
+    #ENTRIES_DICT[lineInfo['name']] = list(unsavedEntries)
 
-print(str(len(ENTRIES_DICT)) + " unique youtube channel(s) were read.")
+print(str(len(ENTRIES)) + " unique youtube channel(s) were read.")
 
 while True:
-    commands.process_command_input(ENTRIES_DICT, input("> "))
+    commands.process_command_input(ENTRIES, input("> "))

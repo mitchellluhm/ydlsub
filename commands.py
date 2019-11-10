@@ -24,7 +24,7 @@ CMD_LQ='youtube-dl \
         --yes-playlist '
 
 # compare if search author a is equivalent to author b
-def author_match(a, b):
+def string_match(a, b):
     if a == b or a in b:
         return True
 
@@ -42,18 +42,23 @@ def quit():
 # ls < author : optional >
 def ls(entries_dict, cmd_args):
     if len(cmd_args) == 1:
-        for dest, entries in entries_dict.items():
+        for info, entries in entries_dict:
             print("Author: " + entries[0].author)
-            print("Download Location: " + dest)
+            print("Group: " + info['group'])
+            print("Download Location: " + info['name'])
             print("Unsaved Count: " + str(len(entries)))
             print("")
         return True
     else:
         dl_id_n = 0
-        for dest, entries in entries_dict.items():
-            if author_match(cmd_args[1], entries[0].author):
+        for info, entries in entries_dict:
+            author_match = string_match(cmd_args[1], entries[0].author)
+            group_match = string_match(cmd_args[1], info['group'])
+
+            if author_match or group_match:
                 print("Author: (" + str(dl_id_n) + ") " + entries[0].author)
-                print("Download Location: " + dest)
+                print("Group: " + info['group'])
+                print("Download Location: " + info['name'])
                 print("Unsaved Count: " + str(len(entries)))
                 dl_id_a = 'a'
                 for entry in entries:
@@ -61,7 +66,8 @@ def ls(entries_dict, cmd_args):
                     print("|            * " + entry.published)
                     dl_id_a = chr(ord(dl_id_a) + 1)
                 print("")
-                return True
+                if not group_match:
+                    return True
             
             dl_id_n += 1
 
@@ -78,15 +84,15 @@ def dl(entries_dict, cmd_args):
     else:
         def get_to_downloads(target):
             dl_id_n = 0
-            for dest, entries in entries_dict.items():
+            for info, entries in entries_dict:
                 if target[0] == str(dl_id_n):
                     dl_id_a = 'a'
                     for entry in entries:
                         if (str(dl_id_n) + str(dl_id_a)).upper() == target.upper():
-                            return (dest, [entry])
+                            return (info, [entry])
                         dl_id_a = chr(ord(dl_id_a) + 1)
-                elif not target[0].isnumeric() and author_match(target, entries[0].author):
-                    return (dest, entries)
+                elif not target[0].isnumeric() and string_match(target, entries[0].author):
+                    return (info, entries)
                 dl_id_n += 1
             return ("", [])
 
@@ -104,12 +110,12 @@ def dl(entries_dict, cmd_args):
 
         #dest, entries = parse_to_dl_arg(cmd_args[1])
         pending_dls = parse_to_dl_arg(cmd_args[1])
-        for dest, entries in pending_dls:
-            if len(dest) > 0 and len(entries) > 0:
-                if not os.path.isdir(dest):
-                    os.makedirs(dest)
-                os.chdir(dest)
-                print("Downloading " + str(len(entries)) + " to " + dest)
+        for info, entries in pending_dls:
+            if len(info['name']) > 0 and len(entries) > 0:
+                if not os.path.isdir(info['name']):
+                    os.makedirs(info['name'])
+                os.chdir(info['name'])
+                print("Downloading " + str(len(entries)) + " to " + info['name'])
                 for dl in entries:
                     os.system(CMD_HQ + dl.link)
                 return True
