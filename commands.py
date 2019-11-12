@@ -2,7 +2,7 @@ import sys
 import os
 
 CMD_HQ='youtube-dl \
-        --download-archive "~/archive.log" \
+        --download-archive "~/archiveydl.log" \
         -i \
         --add-metadata \
         --all-subs \
@@ -13,7 +13,7 @@ CMD_HQ='youtube-dl \
         --yes-playlist '
 
 CMD_LQ='youtube-dl \
-        --download-archive "~/archive.log" \
+        --download-archive "~/archiveydl.log" \
         -i \
         --add-metadata \
         --all-subs \
