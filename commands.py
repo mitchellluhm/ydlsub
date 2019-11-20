@@ -118,10 +118,9 @@ def dl(entries_dict, cmd_args):
                 print("Downloading " + str(len(entries)) + " to " + info['name'])
                 for dl in entries:
                     os.system(CMD_HQ + dl.link)
-                return True
 
-    print("ERROR: dl could not be performed.")
-    return False
+    #print("ERROR: dl could not be performed.")
+    return True
 
 
 def process_command_input(entries_dict, cmd):
