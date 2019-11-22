@@ -91,7 +91,7 @@ def interpret_line(line):
     return get_line_parts(line)
 
 
-ARCHIVED_LINES = get_lines("/home/mitchell/archiveydl.log")
+ARCHIVED_LINES = get_lines("/home/mitchell/archive.log")
 def already_downloaded(watch_id):
     for line in ARCHIVED_LINES:
         if watch_id in line:
