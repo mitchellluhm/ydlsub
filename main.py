@@ -1,13 +1,10 @@
 import sys
-import os
-import requests
-import re
 import feedparser
 import commands
 import config
 
-CMD_HQ='youtube-dl \
-        --download-archive "~/archiveydl.log" \
+CMD_HQ = 'youtube-dl \
+        --download-archive "~/archive.log" \
         -i \
         --add-metadata \
         --all-subs \
@@ -17,8 +14,8 @@ CMD_HQ='youtube-dl \
         --merge-output-format mkv \
         --yes-playlist '
 
-CMD_LQ='youtube-dl \
-        --download-archive "~/archiveydl.log" \
+CMD_LQ = 'youtube-dl \
+        --download-archive "~/archive.log" \
         -i \
         --add-metadata \
         --all-subs \
@@ -32,6 +29,11 @@ BASE_URL_CHANNEL = "https://www.youtube.com/feeds/videos.xml?channel_id="
 BASE_URL_USER = "https://www.youtube.com/feeds/videos.xml?user="
 CHANNEL = "/channel/"
 USER = "/user/"
+CURRENT_GROUP = ""
+WATCH = "watch\?"
+ENTRIES = [] # (lineInfo, entries)
+QUIT = False
+
 
 def get_lines(filename):
     with open(filename, 'r') as f:
@@ -48,28 +50,27 @@ def is_comment_or_empty(line):
 
 
 def get_rss_url(line):
-    l = line.strip()
-    i = l.find(CHANNEL)
+    line = line.strip()
+    i = line.find(CHANNEL)
     if i > 0:
-        return BASE_URL_CHANNEL + l[i + len(CHANNEL):]
+        return BASE_URL_CHANNEL + line[i + len(CHANNEL):]
 
-    i = l.find(USER)
+    i = line.find(USER)
     if i > 0:
-        return BASE_URL_USER + l[i + len(USER):]
+        return BASE_URL_USER + line[i + len(USER):]
 
     return line
 
 
-CURRENT_GROUP = ""
 def get_line_parts(line):
     parts = line.split(' ')
     if len(parts) < 2:
         return {}
 
     partsDict = {
-        'url' : get_rss_url(parts[0]),
-        'group' : CURRENT_GROUP,
-        'name' : parts[1].strip()
+        'url': get_rss_url(parts[0]),
+        'group': CURRENT_GROUP,
+        'name': parts[1].strip()
     }
 
     return partsDict
@@ -104,15 +105,10 @@ if len(sys.argv) < 2:
     print("Not enough arguments")
     sys.exit()
 
-LINES = get_lines(sys.argv[1])
-#BASE_PATH = sys.argv[2]
-WATCH = "watch\?"
-ENTRIES = [] # (lineInfo, entries)
-QUIT = False
 config.parse_config()
 
 # URL HQ LOCATION
-for line in LINES:
+for line in get_lines(sys.argv[1]):
     lineInfo = interpret_line(line)
     if lineInfo == {}:
         continue
@@ -129,7 +125,11 @@ for line in LINES:
     ENTRIES.append( (lineInfo, list(unsavedEntries)) )
     #ENTRIES_DICT[lineInfo['name']] = list(unsavedEntries)
 
-print(str(len(ENTRIES)) + " unique youtube channel(s) were read.")
+if len(ENTRIES) != 1:
+    print(str(len(ENTRIES)) + " unique youtube channels were read.")
+else:
+    print("1 unique youtube channel was read.")
+
 
 while True:
     commands.process_command_input(ENTRIES, input("> "))

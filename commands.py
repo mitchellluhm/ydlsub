@@ -1,27 +1,28 @@
 import sys
 import os
 
-CMD_HQ='youtube-dl \
-        --download-archive "~/archive.log" \
-        -i \
-        --add-metadata \
-        --all-subs \
-        --embed-subs \
-        --embed-thumbnail \
-        -f "(bestvideo[vcodec^=av01][height>=1080][fps>30]/bestvideo[vcodec=vp9.2][height>=1080][fps>30]/bestvideo[vcodec=vp9][height>=1080][fps>30]/bestvideo[vcodec^=av01][height>=1080]/bestvideo[vcodec=vp9.2][height>=1080]/bestvideo[vcodec=vp9][height>=1080]/bestvideo[height>=1080]/bestvideo[vcodec^=av01][height>=720][fps>30]/bestvideo[vcodec=vp9.2][height>=720][fps>30]/bestvideo[vcodec=vp9][height>=720][fps>30]/bestvideo[vcodec^=av01][height>=720]/bestvideo[vcodec=vp9.2][height>=720]/bestvideo[vcodec=vp9][height>=720]/bestvideo[height>=720]/bestvideo)+(bestaudio[acodec=opus]/bestaudio)/best" \
-        --merge-output-format mkv \
-        --yes-playlist '
+CMD_HQ = 'youtube-dl \
+          --download-archive "~/archive.log" \
+          -i \
+          --add-metadata \
+          --all-subs \
+          --embed-subs \
+          --embed-thumbnail \
+          -f "(bestvideo[vcodec^=av01][height>=1080][fps>30]/bestvideo[vcodec=vp9.2][height>=1080][fps>30]/bestvideo[vcodec=vp9][height>=1080][fps>30]/bestvideo[vcodec^=av01][height>=1080]/bestvideo[vcodec=vp9.2][height>=1080]/bestvideo[vcodec=vp9][height>=1080]/bestvideo[height>=1080]/bestvideo[vcodec^=av01][height>=720][fps>30]/bestvideo[vcodec=vp9.2][height>=720][fps>30]/bestvideo[vcodec=vp9][height>=720][fps>30]/bestvideo[vcodec^=av01][height>=720]/bestvideo[vcodec=vp9.2][height>=720]/bestvideo[vcodec=vp9][height>=720]/bestvideo[height>=720]/bestvideo)+(bestaudio[acodec=opus]/bestaudio)/best" \
+          --merge-output-format mkv \
+          --yes-playlist '
 
-CMD_LQ='youtube-dl \
-        --download-archive "~/archive.log" \
-        -i \
-        --add-metadata \
-        --all-subs \
-        --embed-subs \
-        --embed-thumbnail \
-        -f best \
-        --merge-output-format mkv \
-        --yes-playlist '
+CMD_LQ = 'youtube-dl \
+          --download-archive "~/archive.log" \
+          -i \
+          --add-metadata \
+          --all-subs \
+          --embed-subs \
+          --embed-thumbnail \
+          -f best \
+          --merge-output-format mkv \
+          --yes-playlist '
+
 
 # compare if search author a is equivalent to author b
 def string_match(a, b):
@@ -127,6 +128,14 @@ def dl(entries_dict, cmd_args):
     return True
 
 
+def set_download_path(a, b):
+    return True
+
+
+def refresh():
+    return True
+
+
 def process_command_input(entries_dict, cmd):
     cmd_args = cmd.split(' ')
     if len(cmd_args) == 0:
@@ -140,5 +149,7 @@ def process_command_input(entries_dict, cmd):
         dl(entries_dict, cmd_args)
     elif cmd_args[0] in ['s', 'sp', 'set', 'setp', 'setpath', 'setdlpath']:
         set_download_path(entries_dict, cmd_args)
+    elif cmd_args[0] in ['r', 'refresh']:
+        refresh()
 
     return False
