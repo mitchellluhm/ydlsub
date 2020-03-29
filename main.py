@@ -3,28 +3,6 @@ import feedparser
 import commands
 import config
 
-CMD_HQ = 'youtube-dl \
-        --download-archive "~/archive.log" \
-        -i \
-        --add-metadata \
-        --all-subs \
-        --embed-subs \
-        --embed-thumbnail \
-        -f "(bestvideo[vcodec^=av01][height>=1080][fps>30]/bestvideo[vcodec=vp9.2][height>=1080][fps>30]/bestvideo[vcodec=vp9][height>=1080][fps>30]/bestvideo[vcodec^=av01][height>=1080]/bestvideo[vcodec=vp9.2][height>=1080]/bestvideo[vcodec=vp9][height>=1080]/bestvideo[height>=1080]/bestvideo[vcodec^=av01][height>=720][fps>30]/bestvideo[vcodec=vp9.2][height>=720][fps>30]/bestvideo[vcodec=vp9][height>=720][fps>30]/bestvideo[vcodec^=av01][height>=720]/bestvideo[vcodec=vp9.2][height>=720]/bestvideo[vcodec=vp9][height>=720]/bestvideo[height>=720]/bestvideo)+(bestaudio[acodec=opus]/bestaudio)/best" \
-        --merge-output-format mkv \
-        --yes-playlist '
-
-CMD_LQ = 'youtube-dl \
-        --download-archive "~/archive.log" \
-        -i \
-        --add-metadata \
-        --all-subs \
-        --embed-subs \
-        --embed-thumbnail \
-        -f best \
-        --merge-output-format mkv \
-        --yes-playlist '
-
 BASE_URL_CHANNEL = "https://www.youtube.com/feeds/videos.xml?channel_id="
 BASE_URL_USER = "https://www.youtube.com/feeds/videos.xml?user="
 CHANNEL = "/channel/"
@@ -32,12 +10,12 @@ USER = "/user/"
 CURRENT_GROUP = ""
 WATCH = "watch\?"
 ENTRIES = [] # (lineInfo, entries)
-QUIT = False
 
 
 def get_lines(filename):
     with open(filename, 'r') as f:
         return f.readlines()
+
     return []
 
 
@@ -65,6 +43,7 @@ def get_rss_url(line):
 def get_line_parts(line):
     parts = line.split(' ')
     if len(parts) < 2:
+        print("Line '" + line + "' does not define a url and name")
         return {}
 
     partsDict = {
@@ -122,7 +101,7 @@ for line in get_lines(sys.argv[1]):
     if len(unsavedEntries) == 0:
         continue
 
-    ENTRIES.append( (lineInfo, list(unsavedEntries)) )
+    ENTRIES.append((lineInfo, list(unsavedEntries)))
     #ENTRIES_DICT[lineInfo['name']] = list(unsavedEntries)
 
 if len(ENTRIES) != 1:
